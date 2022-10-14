@@ -3,6 +3,7 @@ import { generate, parse, transform, stringify } from "csv";
 import { filewalker } from "./common/filewalker.js";
 import { queryParams } from "./common/queryParams.js";
 import { fixErrors } from "./fixErrors.js";
+import { editCSV } from "./editCSV.js";
 
 const pathBase = process.cwd();
 
@@ -17,7 +18,6 @@ const searchDirs = async () => {
   });
   return pathArr;
 };
-
 
 const selectCSVfile = async function () {
   const paths = await searchDirs(".csv");
@@ -34,11 +34,15 @@ const options = async function () {
     return false;
   }
   const { type: tarea } = await queryParams("list", "Que quieres hacer:", [
+    "Actualizar datos",
     "Eliminar errores en el archivo"
   ]);
   switch (tarea) {
     case "Eliminar errores en el archivo":
       await fixErrors(pathCSV, CSVfile);
+      break;
+    case "Actualizar datos":
+      await editCSV(pathCSV, CSVfile);
       break;
     default:
       break;
