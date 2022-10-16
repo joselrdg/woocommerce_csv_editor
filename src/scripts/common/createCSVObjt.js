@@ -34,7 +34,7 @@ const createCSVOjtR = async (data) => {
       const totalRow = dataRow.length;
       const datosTubo = {};
       for (let column = 0; column < totalHead; column++) {
-        const header = headers[column].replaceAll('"', "");
+        const header = headers[column];
         datosTubo[header] = dataRow[column]
           ? dataRow[column].replaceAll("[AaMm]", ",")
           : "";
@@ -45,7 +45,7 @@ const createCSVOjtR = async (data) => {
   return { headers, data: dataVariables };
 };
 
-const start = async (data, path, fileName) => {
+const start = async (data) => {
   return await createCSVOjtR(data);
 };
 
