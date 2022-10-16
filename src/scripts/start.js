@@ -28,24 +28,26 @@ const selectCSVfile = async function () {
 };
 
 const options = async function () {
-  const CSVfile = await selectCSVfile();
-  if (!CSVfile) {
-    console.log(chalk.red("No se encontraron archivos en " + pathCSV));
-    return false;
-  }
-  const { type: tarea } = await queryParams("list", "Que quieres hacer:", [
-    "Actualizar datos",
-    "Eliminar errores en el archivo"
-  ]);
-  switch (tarea) {
-    case "Eliminar errores en el archivo":
-      await fixErrors(pathCSV, CSVfile);
-      break;
-    case "Actualizar datos":
-      await editCSV(pathCSV, CSVfile);
-      break;
-    default:
-      break;
+  let salir = false;
+  while (!salir) {
+    const CSVfile = await selectCSVfile();
+    if (!CSVfile) {
+      console.log(chalk.red("No se encontraron archivos en " + pathCSV));
+      return false;
+    }
+    const { type: tarea } = await queryParams("list", "Que quieres hacer:", [
+      "Actualizar datos",
+      "Eliminar errores en el archivo",
+      "Salir"
+    ]);
+    switch (tarea) {
+      case "Eliminar errores en el archivo":
+        await fixErrors(pathCSV, CSVfile);
+      case "Actualizar datos":
+        await editCSV(pathCSV, CSVfile);
+      case "Salir":
+        salir = true;
+    }
   }
 };
 

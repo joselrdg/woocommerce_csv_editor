@@ -3,20 +3,23 @@ import chalk from "chalk";
 import ObjectsToCsv from "objects-to-csv";
 import { queryParams } from "./common/queryParams.js";
 import { createCSVObjt } from "./common/createCSVObjt.js";
+import { writeCSV } from "./common/writeCSV.js";
+import { getdate } from "./common/getdate.js";
+import { HEADERS } from "./common/HEADERS.js";
 
-// const updateAll = async (data, header, value, posicion) => {
-//   for (let index = 0; index < data.length; index++) {
-//     const producto = data[index];
-//     for (const key in producto) {
-//       if (Object.hasOwnProperty.call(producto, key)) {
-//         const element = producto[key];
-//         if (key === header ) {
-//           console.log("header: " + header + " key: " + key + " value: " + value);
-//         }
-//       }
-//     }
-//   }
-// };
+const selectKeyVal = async (idioma = "es") => {
+  const { type: keyRest } = await queryParams(
+    "list",
+    "Selecciona header:",
+    Object.keys(HEADERS[idioma])
+  );
+  const { type: value } = await queryParams(
+    "list",
+    "Selecciona valor:",
+    HEADERS[idioma][keyRest]
+  );
+  return { keyRest, value };
+};
 
 const rplace = (e, header, value, posicion) => {
   if (posicion === "Reemplazar el valor") {
@@ -26,72 +29,135 @@ const rplace = (e, header, value, posicion) => {
   } else if (posicion === "Añadir al final valor") {
     e[header] = e[header] + " " + value;
   }
+  return e;
 };
 
 const updateAll = async (data, header, value, posicion, restring = false) => {
   return data.map((e) => {
-    if (e[restring.keyRest] === restring.value) {
-      console.log("Es ingual si señor");
-    } else return rplace(e);
+    if (!restring || e[restring.keyRest] === restring.value) {
+      return rplace(e, header.replaceAll('"', ""), value, posicion);
+    } else return e;
   });
+};
+
+const deleteRow = async (data, query) => {
+  return data.filter((e) => {
+    let is = 0;
+    query.forEach((q) => {
+      if (e[q.key] === q.value) {
+        is++;
+      }
+    });
+    const save = is === query.length ? false : true;
+    !save && console.log(chalk(e[0] + " eliminado"));
+    return save;
+  });
+};
+
+const filterValues = async (data, key) => {
+  const r = [];
+  data.forEach((e) => {
+    if (r.indexOf(e[key]) === -1) {
+      r.push(e[key]);
+    }
+  });
+  return r;
 };
 
 const options = async function (headers, data) {
   const { type: tarea } = await queryParams("list", "Que quieres hacer:", [
     "Actualizar valor en todos los productos",
-    "Actualizar valor por key"
+    "Actualizar valor por key",
+    "Eliminar fila"
   ]);
-  const { type: key } = await queryParams(
-    "list",
-    "Selecciona header a actulaizar:",
-    headers
-  );
-  const { type: value } = await queryParams("text", "Escribe un valor:");
-  const { type: posicion } = await queryParams(
-    "list",
-    "Donde lo quieres añadir:",
-    ["Reemplazar el valor", "Añadir al principo valor", "Añadir al final valor"]
-  );
-  switch (tarea) {
-    case "Actualizar valor en todos los productos":
-      data = await updateAll(data, key, value, posicion, false);
-      console.log(data[data.length - 1]);
-      break;
-    case "Actualizar valor por key":
-      const { type: keyRest } = await queryParams(
+  if (tarea === "Eliminar fila") {
+    const query = [];
+    let fin = false;
+    while (!fin) {
+      const { type: key } = await queryParams(
         "list",
-        "Selecciona header a restringir:",
+        "Selecciona header a buscar:",
         headers
       );
-      const { type } = await queryParams("list", "Valor a restingir:", [
-        "Seleccionar",
-        "Introducir"
+
+      let { type: value } = await queryParams("text", "Escribe un valor:");
+      query.push({ key: key.replaceAll('"', ""), value });
+      const { type: cont } = await queryParams("list", "Terminar:", [
+        "Añadir restricción",
+        "Terminar"
       ]);
-      let rest = { keyRest };
-      if (type === "Introducir") {
-        const { type: valueRest } = await queryParams(
-          "text",
-          "Escribe un valor:"
-        );
-        rest.value = valueRest;
+      if (cont === "Terminar") {
+        fin = true;
       }
-      data = await updateAll(data, key, value, posicion, rest);
-      console.log(data[data.length - 1]);
-      break;
-    default:
-      break;
+    }
+    data = await deleteRow(data, query);
+    return data;
+  } else {
+    const { type: key } = await queryParams(
+      "list",
+      "Selecciona header a actualizar:",
+      headers
+    );
+    const { type: value } = await queryParams("text", "Escribe un valor:");
+    const { type: posicion } = await queryParams(
+      "list",
+      "Donde lo quieres añadir:",
+      [
+        "Reemplazar el valor",
+        "Añadir al principo valor",
+        "Añadir al final valor"
+      ]
+    );
+    switch (tarea) {
+      case "Actualizar valor en todos los productos":
+        data = await updateAll(data, key, value, posicion, false);
+        break;
+      case "Actualizar valor por key":
+        const { type } = await queryParams("list", "Valor a restingir:", [
+          "Seleccionar",
+          "Introducir"
+        ]);
+        let rest = {};
+        if (type === "Introducir") {
+          const { type: keyRest } = await queryParams(
+            "list",
+            "Selecciona header a restringir:",
+            headers
+          );
+          const { type: valueRest } = await queryParams(
+            "text",
+            "Escribe un valor:"
+          );
+          rest = { keyRest, value: valueRest };
+        } else {
+          rest = await selectKeyVal();
+        }
+        data = await updateAll(data, key, value, posicion, rest);
+        break;
+      default:
+        break;
+    }
+    return data;
   }
 };
 
 const start = async (path, fileName) => {
   const { headers, data } = await createCSVObjt(path, fileName);
-  console.log(headers);
-  const op = await options(headers, data);
+  let newData = data;
+  let fin = false;
+  while (!fin) {
+    newData = await options(headers, newData);
+    const { type: cont } = await queryParams("list", "Terminar:", [
+      "Actualizar nuevo dato",
+      "Terminar"
+    ]);
+    if (cont === "Terminar") {
+      await writeCSV(path, newData, "update-" + getdate() + "-" + fileName);
+      fin = true;
+    }
+  }
 };
 
 export function editCSV(path, fileName) {
-  return new Promise((resolve) => {
-    start(path, fileName);
-    resolve("data");
-  });
+  start(path, fileName);
 }
