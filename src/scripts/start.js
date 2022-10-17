@@ -1,12 +1,14 @@
 import chalk from "chalk";
 import { filewalker } from "./common/filewalker.js";
 import { queryParams } from "./common/queryParams.js";
+import { createCSVObjt } from "./common/createCSVObjt.js";
 import { fixErrors } from "./fixErrors.js";
 import { editCSV } from "./editCSV.js";
+import { addtext } from "./addtext.js";
 
-const pathBase = process.cwd();
+// const pathBase = process.cwd();
 
-const pathCSV = pathBase + "/src/csv/";
+const pathCSV = process.cwd() + "/src/csv/";
 
 const searchDirs = async () => {
   const pathArr = await filewalker(pathCSV, {
@@ -33,18 +35,21 @@ const options = async function () {
       console.log(chalk.red("No se encontraron archivos en " + pathCSV));
       return false;
     }
+    const { headers, data } = await createCSVObjt(pathCSV, CSVfile);
     const { type: tarea } = await queryParams("list", "Que quieres hacer:", [
       "Actualizar datos",
+      "ADD Texto",
       "Eliminar errores en el archivo",
       "Salir"
     ]);
-    switch (tarea) {
-      case "Eliminar errores en el archivo":
-        await fixErrors(pathCSV, CSVfile);
-      case "Actualizar datos":
-        await editCSV(pathCSV, CSVfile);
-      case "Salir":
-        salir = true;
+    if (tarea === "Eliminar errores en el archivo") {
+      await fixErrors(pathCSV, CSVfile);
+    } else if (tarea === "Actualizar datos") {
+      await editCSV(pathCSV, CSVfile, headers, data);
+    } else if (tarea === "ADD Texto") {
+      await addtext(pathCSV, CSVfile, headers, data);
+    } else {
+      salir = true;
     }
   }
 };
