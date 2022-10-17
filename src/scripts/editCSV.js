@@ -152,7 +152,7 @@ const start = async (path, fileName) => {
       "Terminar"
     ]);
     if (cont === "Terminar") {
-      await writeCSV(path, newData, "update-" + getdate() + "-" + fileName);
+      await writeCSV(path, newData, "-updated-" + getdate() + "-" + fileName);
       fin = true;
     }
   }

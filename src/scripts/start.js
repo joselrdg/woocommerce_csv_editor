@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import { generate, parse, transform, stringify } from "csv";
 import { filewalker } from "./common/filewalker.js";
 import { queryParams } from "./common/queryParams.js";
 import { fixErrors } from "./fixErrors.js";
@@ -7,7 +6,6 @@ import { editCSV } from "./editCSV.js";
 
 const pathBase = process.cwd();
 
-const correcciones = [];
 const pathCSV = pathBase + "/src/csv/";
 
 const searchDirs = async () => {
