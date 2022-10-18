@@ -6,7 +6,7 @@ import { getdate } from "./getdate.js";
 const writeFile = async (path, output) => {
   const { type } = await queryParams("list", "Guardar archivo?:", ["Sí", "No"]);
   if (type !== "No") {
-    let { type: prefijo } = await queryParams("text", "Escribe un nombre:");
+    const { type: prefijo } = await queryParams("text", "Escribe un nombre:");
     const name = getdate() + "-" + prefijo + ".csv";
     try {
       const csv = new ObjectsToCsv(output);
@@ -25,6 +25,6 @@ const writeFile = async (path, output) => {
   } else chalk.green.bold("No se guardo...");
 };
 
-export const writeCSV = async (path, output, name) => {
-  await writeFile(path, output, name);
+export const writeCSV = async (path, output) => {
+  await writeFile(path, output);
 };

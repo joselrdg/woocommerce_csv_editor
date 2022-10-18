@@ -1,3 +1,5 @@
+import { queryParams } from "./queryParams.js";
+
 const filterValues = async (data, key) => {
   const r = [];
   data.forEach((e) => {
@@ -15,7 +17,11 @@ const selectValue = async (data, key) => {
     ["Seleccionar", "Introducir"]
   );
   if (opt === "Seleccionar") {
-    return await filterValues(data, key);
+    return await queryParams(
+      "list",
+      "Introduce valor o selecciona entre los existentes:",
+      await filterValues(data, key)
+    );
   } else return await queryParams("text", "Escribe un valor:");
 };
 
@@ -28,7 +34,7 @@ export const queryRestringRows = async (headers, data) => {
       "Selecciona header a buscar:",
       headers
     );
-    const value = await selectValue(data, key);
+    const { type: value } = await selectValue(data, key);
     query.push({ key: key.replaceAll('"', ""), value });
     const { type: cont } = await queryParams("list", "Terminar:", [
       "Añadir restricción",

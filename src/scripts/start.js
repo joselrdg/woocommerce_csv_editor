@@ -4,7 +4,7 @@ import { queryParams } from "./common/queryParams.js";
 import { createCSVObjt } from "./common/createCSVObjt.js";
 import { fixErrors } from "./fixErrors.js";
 import { editCSV } from "./editCSV.js";
-import { addtext } from "./addtext.js";
+import { modifyDescription } from "./modifyDescription.js";
 
 // const pathBase = process.cwd();
 
@@ -28,17 +28,17 @@ const selectCSVfile = async function () {
 };
 
 const options = async function () {
-  let salir = false;
-  while (!salir) {
-    const CSVfile = await selectCSVfile();
-    if (!CSVfile) {
-      console.log(chalk.red("No se encontraron archivos en " + pathCSV));
-      return false;
-    }
-    const { headers, data } = await createCSVObjt(pathCSV, CSVfile);
+  const CSVfile = await selectCSVfile();
+  if (!CSVfile) {
+    console.log(chalk.red("No se encontraron archivos en " + pathCSV));
+    return false;
+  }
+  const { headers, data } = await createCSVObjt(pathCSV, CSVfile);
+  // let salir = false;
+  // while (!salir) {
     const { type: tarea } = await queryParams("list", "Que quieres hacer:", [
       "Actualizar datos",
-      "ADD Texto",
+      "Modificar descripción",
       "Eliminar errores en el archivo",
       "Salir"
     ]);
@@ -46,12 +46,12 @@ const options = async function () {
       await fixErrors(pathCSV, CSVfile);
     } else if (tarea === "Actualizar datos") {
       await editCSV(pathCSV, CSVfile, headers, data);
-    } else if (tarea === "ADD Texto") {
-      await addtext(pathCSV, CSVfile, headers, data);
+    } else if (tarea === "Modificar descripción") {
+      await modifyDescription(pathCSV, CSVfile, headers, data);
     } else {
       salir = true;
     }
-  }
+  // }
 };
 
 export default function start() {
