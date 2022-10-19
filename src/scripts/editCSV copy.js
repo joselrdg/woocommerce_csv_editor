@@ -158,6 +158,6 @@ const start = async (path, fileName) => {
   }
 };
 
-export function editCSV(path, fileName) {
-  start(path, fileName);
-}
+export const editCSV = async (path, fileName) => {
+  await start(path, fileName);
+};

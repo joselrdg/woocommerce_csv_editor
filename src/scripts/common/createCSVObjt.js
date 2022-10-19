@@ -18,7 +18,8 @@ const formatLine = (line) => {
 const createCSVOjtR = async (data) => {
   const dataVariables = [];
   const allRows = data.toString().split(/\r?\n|\r/);
-  const headers = allRows[0].split(",");
+  const headers = allRows[0].replaceAll('"', "").split(",");
+  // const headers = allRows[0].split(",");
 
   const totalHead = headers.length;
   console.log("Total de Headers: " + totalHead);
@@ -31,7 +32,8 @@ const createCSVOjtR = async (data) => {
       const totalRow = dataRow.length;
       const datosTubo = {};
       for (let column = 0; column < totalHead; column++) {
-        const header = headers[column].replaceAll('"', "");
+        const header = headers[column];
+        // const header = headers[column].replaceAll('"', "");
         datosTubo[header] = dataRow[column]
           ? dataRow[column].replaceAll("[AaMm]", ",")
           : "";
@@ -45,8 +47,6 @@ const createCSVOjtR = async (data) => {
 const start = async (data) => {
   return await createCSVOjtR(data);
 };
-
-
 
 export function createCSVObjt(path, fileName) {
   return new Promise((resolve) => {

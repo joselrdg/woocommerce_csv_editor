@@ -5,6 +5,9 @@ import { createCSVObjt } from "./common/createCSVObjt.js";
 import { fixErrors } from "./fixErrors.js";
 import { editCSV } from "./editCSV.js";
 import { modifyDescription } from "./modifyDescription.js";
+import { sortByPosition } from "./sortByPosition.js";
+import { exportByColumns } from "./exportByColumns.js";
+
 
 // const pathBase = process.cwd();
 
@@ -37,8 +40,10 @@ const options = async function () {
   // let salir = false;
   // while (!salir) {
     const { type: tarea } = await queryParams("list", "Que quieres hacer:", [
-      "Actualizar datos",
       "Modificar descripción",
+      "Ordenar por posición",
+      "Exportar por columnas",
+      "Actualizar datos",
       "Eliminar errores en el archivo",
       "Salir"
     ]);
@@ -48,6 +53,10 @@ const options = async function () {
       await editCSV(pathCSV, CSVfile, headers, data);
     } else if (tarea === "Modificar descripción") {
       await modifyDescription(pathCSV, CSVfile, headers, data);
+    } else if (tarea === "Ordenar por posición") {
+      await sortByPosition(pathCSV, CSVfile, headers, data);
+    } else if (tarea === "Exportar por columnas") {
+      await exportByColumns(pathCSV, CSVfile, headers, data);
     } else {
       salir = true;
     }

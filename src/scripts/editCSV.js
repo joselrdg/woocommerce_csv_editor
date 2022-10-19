@@ -1,11 +1,10 @@
-import fs from "fs";
 import chalk from "chalk";
-import ObjectsToCsv from "objects-to-csv";
 import { queryParams } from "./common/queryParams.js";
 import { createCSVObjt } from "./common/createCSVObjt.js";
 import { writeCSV } from "./common/writeCSV.js";
 import { getdate } from "./common/getdate.js";
 import { HEADERS } from "./common/HEADERS.js";
+import { queryRestringRows } from "./common/queryRestringRows.js";
 
 const selectKeyVal = async (idioma = "es") => {
   const { type: keyRest } = await queryParams(
@@ -54,16 +53,6 @@ const deleteRow = async (data, query) => {
   });
 };
 
-const filterValues = async (data, key) => {
-  const r = [];
-  data.forEach((e) => {
-    if (r.indexOf(e[key]) === -1) {
-      r.push(e[key]);
-    }
-  });
-  return r;
-};
-
 const options = async function (headers, data) {
   const { type: tarea } = await queryParams("list", "Que quieres hacer:", [
     "Actualizar valor en todos los productos",
@@ -71,25 +60,7 @@ const options = async function (headers, data) {
     "Eliminar fila"
   ]);
   if (tarea === "Eliminar fila") {
-    const query = [];
-    let fin = false;
-    while (!fin) {
-      const { type: key } = await queryParams(
-        "list",
-        "Selecciona header a buscar:",
-        headers
-      );
-
-      let { type: value } = await queryParams("text", "Escribe un valor:");
-      query.push({ key: key.replaceAll('"', ""), value });
-      const { type: cont } = await queryParams("list", "Terminar:", [
-        "Añadir restricción",
-        "Terminar"
-      ]);
-      if (cont === "Terminar") {
-        fin = true;
-      }
-    }
+    const query = await queryRestringRows(headers, data);
     data = await deleteRow(data, query);
     return data;
   } else {
