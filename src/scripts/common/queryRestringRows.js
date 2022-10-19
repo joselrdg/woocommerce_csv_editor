@@ -2,13 +2,11 @@ import { queryParams } from "./queryParams.js";
 
 const filterValues = async (data, key) => {
   const r = [];
-  console.log(key)
   data.forEach((e) => {
     if (r.indexOf(e[key]) === -1) {
       r.push(e[key]);
     }
   });
-  console.log(r)
   return r;
 };
 

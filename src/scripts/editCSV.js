@@ -24,9 +24,9 @@ const rplace = (e, header, value, posicion) => {
   if (posicion === "Reemplazar el valor") {
     e[header] = value;
   } else if (posicion === "Añadir al principo valor") {
-    e[header] = value + " " + e[header];
+    e[header] = value + e[header];
   } else if (posicion === "Añadir al final valor") {
-    e[header] = e[header] + " " + value;
+    e[header] = e[header] + value;
   }
   return e;
 };
@@ -48,7 +48,7 @@ const deleteRow = async (data, query) => {
       }
     });
     const save = is === query.length ? false : true;
-    !save && console.log(chalk(e[0] + " eliminado"));
+    !save && console.log(chalk.red(e[query[0]] + " eliminado"));
     return save;
   });
 };

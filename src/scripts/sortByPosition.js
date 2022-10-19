@@ -39,6 +39,16 @@ const options = async function (headers, data) {
     'Selecciona columna "ID":,',
     headers
   );
+  const { type: addnumb } = await queryParams(
+    "list",
+    "Empezar por un número?:,",
+    ["Sí", "No"]
+  );
+  if (addnumb === "Sí") {
+    const { type: n } = await queryParams("text", "Inserta el número:");
+    posicion = Number(n);
+  }
+
   const dataSort = await ordenar([...data], column, direccion);
   for (let i = 0; i < dataSort.length; i++) {
     const e = dataSort[i];
