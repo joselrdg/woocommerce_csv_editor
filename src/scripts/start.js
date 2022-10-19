@@ -7,7 +7,7 @@ import { editCSV } from "./editCSV.js";
 import { modifyDescription } from "./modifyDescription.js";
 import { sortByPosition } from "./sortByPosition.js";
 import { exportByColumns } from "./exportByColumns.js";
-
+import { addSimpleAttribute } from "./addSimpleAttribute.js";
 
 // const pathBase = process.cwd();
 
@@ -37,29 +37,32 @@ const options = async function () {
     return false;
   }
   const { headers, data } = await createCSVObjt(pathCSV, CSVfile);
-  // let salir = false;
+  let salir = false;
   // while (!salir) {
-    const { type: tarea } = await queryParams("list", "Que quieres hacer:", [
-      "Modificar descripción",
-      "Ordenar por posición",
-      "Exportar por columnas",
-      "Actualizar datos",
-      "Eliminar errores en el archivo",
-      "Salir"
-    ]);
-    if (tarea === "Eliminar errores en el archivo") {
-      await fixErrors(pathCSV, CSVfile);
-    } else if (tarea === "Actualizar datos") {
-      await editCSV(pathCSV, CSVfile, headers, data);
-    } else if (tarea === "Modificar descripción") {
-      await modifyDescription(pathCSV, CSVfile, headers, data);
-    } else if (tarea === "Ordenar por posición") {
-      await sortByPosition(pathCSV, CSVfile, headers, data);
-    } else if (tarea === "Exportar por columnas") {
-      await exportByColumns(pathCSV, CSVfile, headers, data);
-    } else {
-      salir = true;
-    }
+  const { type: tarea } = await queryParams("list", "Que quieres hacer:", [
+    "Actualizar datos",
+    "Modificar descripción",
+    "Add atributo simple",
+    "Ordenar por posición",
+    "Eliminar errores en el archivo",
+    "Exportar por columnas",
+    "Salir"
+  ]);
+  if (tarea === "Eliminar errores en el archivo") {
+    await fixErrors(pathCSV, CSVfile);
+  } else if (tarea === "Actualizar datos") {
+    await editCSV(pathCSV, CSVfile, headers, data);
+  } else if (tarea === "Modificar descripción") {
+    await modifyDescription(pathCSV, CSVfile, headers, data);
+  } else if (tarea === "Ordenar por posición") {
+    await sortByPosition(pathCSV, CSVfile, headers, data);
+  } else if (tarea === "Add atributo simple") {
+    await addSimpleAttribute(pathCSV, CSVfile, headers, data);
+  } else if (tarea === "Exportar por columnas") {
+    await exportByColumns(pathCSV, CSVfile, headers, data);
+  } else {
+    salir = true;
+  }
   // }
 };
 
