@@ -28,8 +28,8 @@ const createCSVOjtR = async (data) => {
 
   for (var singleRow = 1; singleRow < allRows.length; singleRow++) {
     let formatRow = formatLine(
-      line + (rowOk ? "" : "\n") + allRows[singleRow]
-    );
+      line + (rowOk ? "" : "\\n") + allRows[singleRow]
+    ).replaceAll("\\n\\n", "\\n");
     const dataRow = formatRow.split(",");
     const totalRow = dataRow.length;
     if (totalHead !== totalRow) {
@@ -46,8 +46,6 @@ const createCSVOjtR = async (data) => {
           ? dataRow[column].replaceAll("[AaMm]", ",")
           : "";
       }
-      console.log(datosTubo);
-      process.exit();
       dataVariables.push(datosTubo);
     }
   }
