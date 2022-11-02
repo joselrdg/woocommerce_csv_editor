@@ -21,11 +21,11 @@ const QPosition = async (goal, type) => {
     case "Palabras":
       return await queryParams("text", "Introduce texto a buscar:");
     case "Linea":
-      return await queryParams("text", "Introduce número de linea:");
+      const linea = await queryParams("text", "Introduce número de linea:");
+      return Number(linea);
     case "Nº caracter":
-      return await queryParams("text", "Introduce número de caracter:");
-    case "Principio" || "Fnal":
-      return 0;
+      const char = await queryParams("text", "Introduce número de caracter:");
+      return Number(char);
   }
 };
 
@@ -77,17 +77,91 @@ const updateDataHTML = async (e, goal, html, column) => {
   }
 };
 
-// const isRow = async (e, query) => {
-//   let is = 0;
-//   query.forEach((q) => {
-//     if (e[q.key] === q.value) {
-//       e[q.key] && is++;
-//     }
-//   });
-//   return is === query.length ? true : false;
-// };
+const deleteTXTForWord = async (e, goal, column) => {
+  const value = e[column];
+  const i = value.indexOf(goal);
+  if (i === -1) {
+    console.log(chalk.red("No se encontraron couincidencias en la columna"));
+    process.exit();
+  }
+  e[column] = value.replace(goal, "");
+  return e;
+};
 
-const insertTXT = async (headers, data, goal, query, column) => {};
+const deleteTXTForLine = async (e, goal, column, indexFinal) => {
+  const values = e[column].split("\\n");
+  console.log(values);
+  const valOk = [];
+  const fin =
+    indexFinal === NaN || indexFinal === 0 ? values.length : indexFinal;
+  for (let i = 0; i < values.length; i++) {
+    if (i < goal) {
+      valOk.push(values[i]);
+    } else if (i > fin) {
+      valOk.push(values[i]);
+    }
+  }
+  e[column] = valOk.join("\\n");
+  console.log(valOk);
+  process.exit();
+  return e;
+};
+const deleteTXTForChar = async (e, goal, column, indexFinal) => {
+  console.log(chalk.red("No esta terminado"));
+  process.exit();
+};
+
+const optDeleteTXT = async (e, goal, column) => {
+  switch (goal.type) {
+    case "Palabras":
+      return await deleteTXTForWord(e, goal.goal, column);
+    case "Linea":
+      const { type: indexLineaFinal } = await queryParams(
+        "text",
+        "Introduce el número de la última linea hasta la que borrar incluida (0 o dejar en blanco borra hasta el final):"
+      );
+      return await deleteTXTForLine(
+        e,
+        goal.goal - 1,
+        column,
+        Number(indexLineaFinal)
+      );
+    case "Nº caracter":
+      const { type: indexCharFinal } = await queryParams(
+        "text",
+        "Introduce el número del último caracter hasta el que borrar incluido (0 o dejar en blanco borra hasta el final):"
+      );
+      return await deleteTXTForChar(
+        e,
+        goal.goal,
+        column,
+        Number(indexCharFinal)
+      );
+  }
+};
+
+const deleteTXT = async (headers, data, goal, query, column) => {
+  const newData = [];
+  for (let i = 0; i < data.length; i++) {
+    const e = data[i];
+    const is = await isRow(e, query);
+    if (is) {
+      newData.push(await optDeleteTXT(e, goal, column));
+    } else newData.push(e);
+  }
+  return newData;
+};
+
+const insertTXT = async (headers, data, goal, query, column) => {
+  console.log(chalk.red("No esta terminado"));
+  process.exit();
+};
+
+const deleteHTML = async (headers, data, goal, query, column) => {
+  console.log(chalk.red("No esta terminado"));
+  process.exit();
+};
+
 const insertHTML = async (headers, data, goal, query, column) => {
   const html = await getHTML();
   const newData = [];
@@ -108,38 +182,35 @@ const options = async function (headers, data) {
     "Que columna quieres actualizar:",
     headers
   );
-  const { type } = await queryParams("list", "Que quieres insertar:", [
+  const { type: b } = await queryParams("list", "Que quieres hacer:", [
+    "Eliminar contenido",
+    "Añadir contenido"
+  ]);
+  const borrar = b === "Eliminar contenido" ? true : false;
+
+  const { type } = await queryParams("list", "Que quieres modificar:", [
     "HTML",
     "TXT"
   ]);
-  const typesTxt =
-    type === "TXT"
-      ? ["Palabras", "Linea", "Nº caracter", "Principio", "Fnal"]
-      : ["Palabras", "Linea", "Nº caracter"];
+
   const { type: goalType } = await queryParams(
     "list",
     "Con respecto a que o donde queieres insertar:",
-    typesTxt
+    ["Palabras", "Linea", "Nº caracter"]
   );
 
   const { type: goal } = await QPosition(goalType, type);
 
+  const params = [headers, data, { type: goalType, goal }, query, column];
+
   if (type === "HTML") {
-    return await insertHTML(
-      headers,
-      data,
-      { type: goalType, goal: Number(goal) },
-      query,
-      column
-    );
+    if (!borrar) {
+      return await insertHTML(...params);
+    } else return await deleteHTML(...params);
   } else {
-    return await insertTXT(
-      headers,
-      data,
-      { type: goalType, goal: Number(goal) },
-      query,
-      column
-    );
+    if (!borrar) {
+      return await insertTXT(...params);
+    } else return await deleteTXT(...params);
   }
 };
 
