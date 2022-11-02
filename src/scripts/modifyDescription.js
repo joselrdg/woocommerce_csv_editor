@@ -21,10 +21,16 @@ const QPosition = async (goal, type) => {
     case "Palabras":
       return await queryParams("text", "Introduce texto a buscar:");
     case "Linea":
-      const linea = await queryParams("text", "Introduce número de linea:");
+      const { type: linea } = await queryParams(
+        "text",
+        "Introduce número de linea:"
+      );
       return Number(linea);
     case "Nº caracter":
-      const char = await queryParams("text", "Introduce número de caracter:");
+      const { type: char } = await queryParams(
+        "text",
+        "Introduce número de caracter:"
+      );
       return Number(char);
   }
 };
@@ -97,13 +103,11 @@ const deleteTXTForLine = async (e, goal, column, indexFinal) => {
   for (let i = 0; i < values.length; i++) {
     if (i < goal) {
       valOk.push(values[i]);
-    } else if (i > fin) {
+    } else if (i >= fin) {
       valOk.push(values[i]);
     }
   }
   e[column] = valOk.join("\\n");
-  console.log(valOk);
-  process.exit();
   return e;
 };
 const deleteTXTForChar = async (e, goal, column, indexFinal) => {
@@ -114,7 +118,8 @@ const deleteTXTForChar = async (e, goal, column, indexFinal) => {
 const optDeleteTXT = async (e, goal, column) => {
   switch (goal.type) {
     case "Palabras":
-      return await deleteTXTForWord(e, goal.goal, column);
+      const { type: palabras } = await deleteTXTForWord(e, goal.goal, column);
+      return palabras;
     case "Linea":
       const { type: indexLineaFinal } = await queryParams(
         "text",
@@ -199,7 +204,7 @@ const options = async function (headers, data) {
     ["Palabras", "Linea", "Nº caracter"]
   );
 
-  const { type: goal } = await QPosition(goalType, type);
+  const goal = await QPosition(goalType, type);
 
   const params = [headers, data, { type: goalType, goal }, query, column];
 
