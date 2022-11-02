@@ -46,7 +46,10 @@ const createCSVOjtR = async (data) => {
         const header = headers[column];
         // const header = headers[column].replaceAll('"', "");
         datosTubo[header] = dataRow[column]
-          ? dataRow[column].replaceAll("[AaMm]", ",")
+          ? dataRow[column]
+              .replace(/^"/, "")
+              .replace(/"$/, "")
+              .replaceAll("[AaMm]", ",")
           : "";
       }
       dataVariables.push(datosTubo);

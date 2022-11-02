@@ -96,7 +96,6 @@ const deleteTXTForWord = async (e, goal, column) => {
 
 const deleteTXTForLine = async (e, goal, column, indexFinal) => {
   const values = e[column].split("\\n");
-  console.log(values);
   const valOk = [];
   const fin =
     indexFinal === NaN || indexFinal === 0 ? values.length : indexFinal;
@@ -115,33 +114,33 @@ const deleteTXTForChar = async (e, goal, column, indexFinal) => {
   process.exit();
 };
 
+let indexLCFinal = undefined;
+let indexLCFinalSave = false;
 const optDeleteTXT = async (e, goal, column) => {
   switch (goal.type) {
     case "Palabras":
       const { type: palabras } = await deleteTXTForWord(e, goal.goal, column);
       return palabras;
     case "Linea":
-      const { type: indexLineaFinal } = await queryParams(
-        "text",
-        "Introduce el número de la última linea hasta la que borrar incluida (0 o dejar en blanco borra hasta el final):"
-      );
-      return await deleteTXTForLine(
-        e,
-        goal.goal - 1,
-        column,
-        Number(indexLineaFinal)
-      );
+      if (!indexLCFinalSave) {
+        const { type: indexLineaFinal } = await queryParams(
+          "text",
+          "Introduce el número de la última linea hasta la que borrar incluida (0 o dejar en blanco borra hasta el final):"
+        );
+        indexLCFinal = Number(indexLineaFinal);
+        indexLCFinalSave = true;
+      }
+      return await deleteTXTForLine(e, goal.goal - 1, column, indexLCFinal);
     case "Nº caracter":
-      const { type: indexCharFinal } = await queryParams(
-        "text",
-        "Introduce el número del último caracter hasta el que borrar incluido (0 o dejar en blanco borra hasta el final):"
-      );
-      return await deleteTXTForChar(
-        e,
-        goal.goal,
-        column,
-        Number(indexCharFinal)
-      );
+      if (!indexLCFinalSave) {
+        const { type: indexCharFinal } = await queryParams(
+          "text",
+          "Introduce el número del último caracter hasta el que borrar incluido (0 o dejar en blanco borra hasta el final):"
+        );
+        indexLCFinal = Number(indexCharFinal);
+        indexLCFinalSave = true;
+      }
+      return await deleteTXTForChar(e, goal.goal, column, Number(indexLCFinal));
   }
 };
 
@@ -154,6 +153,8 @@ const deleteTXT = async (headers, data, goal, query, column) => {
       newData.push(await optDeleteTXT(e, goal, column));
     } else newData.push(e);
   }
+  indexLCFinal = undefined;
+  indexLCFinalSave = false;
   return newData;
 };
 
