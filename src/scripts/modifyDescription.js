@@ -56,7 +56,7 @@ const updateForWord = async (e, goal, html, column) => {
   const f = i + goal.length;
   if (i === -1) {
     console.log(chalk.red("No se encontraron couincidencias en la columna"));
-    process.exit();
+    // process.exit();
   }
   e[column] =
     value.slice(0, i) + html[0] + value.slice(i, f) + html[1] + value.slice(f);
@@ -86,12 +86,10 @@ const updateDataHTML = async (e, goal, html, column) => {
 
 const deleteTXTForWord = async (e, goal, column) => {
   const value = e[column];
-  console.log(value);
-  console.log(goal);
   const i = value.indexOf(goal);
   if (i === -1) {
     console.log(chalk.red("No se encontraron couincidencias en la columna"));
-    process.exit();
+    // process.exit();
   }
   e[column] = value.replace(goal, "");
   return e;
