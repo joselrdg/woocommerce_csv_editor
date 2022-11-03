@@ -19,7 +19,8 @@ const getHTML = async () => {
 const QPosition = async (goal, type) => {
   switch (goal) {
     case "Palabras":
-      return await queryParams("text", "Introduce texto a buscar:");
+      const { type: palabras } = await queryParams("text", "Introduce texto a buscar:");
+      return palabras;
     case "Linea":
       const { type: linea } = await queryParams(
         "text",
@@ -85,6 +86,8 @@ const updateDataHTML = async (e, goal, html, column) => {
 
 const deleteTXTForWord = async (e, goal, column) => {
   const value = e[column];
+  console.log(value);
+  console.log(goal);
   const i = value.indexOf(goal);
   if (i === -1) {
     console.log(chalk.red("No se encontraron couincidencias en la columna"));
@@ -119,8 +122,7 @@ let indexLCFinalSave = false;
 const optDeleteTXT = async (e, goal, column) => {
   switch (goal.type) {
     case "Palabras":
-      const { type: palabras } = await deleteTXTForWord(e, goal.goal, column);
-      return palabras;
+      return await deleteTXTForWord(e, goal.goal, column);
     case "Linea":
       if (!indexLCFinalSave) {
         const { type: indexLineaFinal } = await queryParams(
