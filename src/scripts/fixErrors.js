@@ -19,6 +19,7 @@ const formatLine = (line) => {
 };
 
 const writeFile = async (path, output, name) => {
+  console.log(chalk.italic.yellow('\nSi hay saltos de linea en en las columnas seguirán los errores.\nLos saltos de linea tendrán "," que no tenian que estar\n'))
   const { type } = await queryParams("list", "Guardar archivo?:", ["Sí", "No"]);
   if (type !== "No") {
     try {
@@ -42,9 +43,6 @@ const start = async (data, path, fileName) => {
   const dataVariables = [];
   const allRows = data.toString().split(/\r?\n|\r/);
   const headers = allRows[0].split(",");
-  console.log("Headers:");
-  console.log(headers);
-  console.log("\n");
 
   const totalHead = headers.length;
   console.log("Total de Headers: " + totalHead);

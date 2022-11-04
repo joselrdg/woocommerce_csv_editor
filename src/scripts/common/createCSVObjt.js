@@ -1,4 +1,7 @@
+import chalk from "chalk";
 import fs from "fs";
+
+// TO DO: Eliminar dublicado de ""
 
 const formatLine = (line) => {
   let strF = line;
@@ -22,7 +25,6 @@ const createCSVOjtR = async (data) => {
 
   const totalHead = headers.length;
   console.log("Total de Headers: " + totalHead);
-
   let line = "";
   let rowOk = true;
 
@@ -35,6 +37,12 @@ const createCSVOjtR = async (data) => {
     }
     const dataRow = formatRow.split(",");
     const totalRow = dataRow.length;
+    if (totalRow > totalHead) {
+      console.log(chalk.red("Error, diferente número de culumnas en headers y en productos"));
+      console.log("- Headers: " + totalHead + "  Columnas: " + totalRow);
+      // process.exit();
+    }
+
     if (totalHead !== totalRow) {
       rowOk = false;
       line = formatRow;
@@ -55,7 +63,6 @@ const createCSVOjtR = async (data) => {
       dataVariables.push(datosTubo);
     }
   }
-
   return { headers, data: dataVariables };
 };
 
