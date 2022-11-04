@@ -18,6 +18,7 @@ const formatLine = (line) => {
   return (formatRow += strF).replaceAll("'", '"');
 };
 
+let salir = false;
 const createCSVOjtR = async (data) => {
   const dataVariables = [];
   const allRows = data.toString().split(/\r?\n|\r/);
@@ -38,9 +39,14 @@ const createCSVOjtR = async (data) => {
     const dataRow = formatRow.split(",");
     const totalRow = dataRow.length;
     if (totalRow > totalHead) {
-      console.log(chalk.red("Error, diferente número de culumnas en headers y en productos"));
+      console.log(
+        chalk.red(
+          "Error, diferente número de culumnas en headers y en productos"
+        )
+      );
       console.log("- Headers: " + totalHead + "  Columnas: " + totalRow);
-      // process.exit();
+      salir = true;
+      return { headers, data: undefined };
     }
 
     if (totalHead !== totalRow) {
