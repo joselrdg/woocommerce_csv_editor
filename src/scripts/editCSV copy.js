@@ -24,9 +24,9 @@ const selectKeyVal = async (idioma = "es") => {
 const rplace = (e, header, value, posicion) => {
   if (posicion === "Reemplazar el valor") {
     e[header] = value;
-  } else if (posicion === "Añadir al principo valor") {
+  } else if (posicion === "Añadir valor al principo") {
     e[header] = value + " " + e[header];
-  } else if (posicion === "Añadir al final valor") {
+  } else if (posicion === "Añadir valor al final") {
     e[header] = e[header] + " " + value;
   }
   return e;
@@ -104,8 +104,8 @@ const options = async function (headers, data) {
       "Donde lo quieres añadir:",
       [
         "Reemplazar el valor",
-        "Añadir al principo valor",
-        "Añadir al final valor"
+        "Añadir valor al principo",
+        "Añadir valor al final"
       ]
     );
     switch (tarea) {

@@ -8,6 +8,7 @@ import { modifyDescription } from "./modifyDescription.js";
 import { sortByPosition } from "./sortByPosition.js";
 import { exportByColumns } from "./exportByColumns.js";
 import { addSimpleAttribute } from "./addSimpleAttribute.js";
+import { copyColumnInOther } from "./copyColumnInOther.js";
 
 // const pathBase = process.cwd();
 
@@ -44,6 +45,7 @@ const options = async function () {
     "Modificar descripción",
     "Add atributo simple",
     "Ordenar por posición",
+    "Copiar columna en otra",
     "Eliminar errores en el archivo",
     "Exportar por columnas",
     "Salir"
@@ -56,6 +58,8 @@ const options = async function () {
     await modifyDescription(pathCSV, CSVfile, headers, data);
   } else if (tarea === "Ordenar por posición") {
     await sortByPosition(pathCSV, CSVfile, headers, data);
+  } else if (tarea === "Copiar columna en otra") {
+    await copyColumnInOther(pathCSV, CSVfile, headers, data);
   } else if (tarea === "Add atributo simple") {
     await addSimpleAttribute(pathCSV, CSVfile, headers, data);
   } else if (tarea === "Exportar por columnas") {
